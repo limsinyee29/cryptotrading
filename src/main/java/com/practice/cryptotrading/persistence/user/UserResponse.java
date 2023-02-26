@@ -6,6 +6,8 @@ public class UserResponse {
 
 	private String name;
 
+	private Double walletBalance;
+
 	public UserResponse() {
 
 	}
@@ -13,6 +15,7 @@ public class UserResponse {
 	public UserResponse(User user) {
 		this.id = user.getId();
 		this.name = user.getName();
+		this.walletBalance = user.getWallet() != null ? user.getWallet().getBalance() : 0;
 	}
 
 	public long getId() {
@@ -29,6 +32,14 @@ public class UserResponse {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Double getWalletBalance() {
+		return walletBalance;
+	}
+
+	public void setWalletBalance(Double walletBalance) {
+		this.walletBalance = walletBalance;
 	}
 
 }
