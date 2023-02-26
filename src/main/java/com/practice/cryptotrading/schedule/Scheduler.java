@@ -51,46 +51,28 @@ public class Scheduler {
 			double lowestAskPrice = Double.MAX_VALUE;
 			
 			if (binanceList != null) {
-				Optional<Double> bidPrice = binanceList.stream()
-						.filter(b -> b.getSymbol().equalsIgnoreCase(cryptoTradingType.name())).map(Binance::getBidPrice)
-						.max(Double::compare);
-				if (bidPrice.isPresent()) {
-//					String log="Binance bidPrice ("+cryptoTradingType.name()+") "+bidPrice.get();
-//					logger.info(log);
-					highestBidPrice = Math.max(highestBidPrice, bidPrice.get());
-				}
-				Optional<Double> askPrice = binanceList.stream()
-						.filter(b -> b.getSymbol().equalsIgnoreCase(cryptoTradingType.name())).map(Binance::getAskPrice)
-						.min(Double::compare);
-				if (askPrice.isPresent()) {
-//					String log="Binance askPrice ("+cryptoTradingType.name()+") "+askPrice.get();
-//					logger.info(log);
-					lowestAskPrice = Math.min(lowestAskPrice, askPrice.get());
+				Optional<Binance> optBinance = binanceList.stream()
+						.filter(b -> b.getSymbol().equalsIgnoreCase(cryptoTradingType.name())).findFirst();
+				if (optBinance.isPresent()) {
+					Binance binance = optBinance.get();
+					highestBidPrice = Math.max(highestBidPrice, binance.getBidPrice());
+					lowestAskPrice = Math.min(lowestAskPrice, binance.getAskPrice());
 				}
 
 			}
 			if (houbiList != null) {
-				Optional<Double> bidPrice = houbiList.stream()
-						.filter(b -> b.getSymbol().equalsIgnoreCase(cryptoTradingType.name()))
-						.map(h -> h.getBid()).max(Double::compare);
-				if (bidPrice.isPresent()) {
-//					String log="Houbi bidPrice ("+cryptoTradingType.name()+") "+bidPrice.get();
-//					logger.info(log);
-					highestBidPrice = Math.max(highestBidPrice, bidPrice.get());
-				}
-				Optional<Double> askPrice = houbiList.stream()
-						.filter(b -> b.getSymbol().equalsIgnoreCase(cryptoTradingType.name()))
-						.map(h -> h.getAsk()).min(Double::compare);
-				if (askPrice.isPresent()) {
-//					String log="Houbi askPrice ("+cryptoTradingType.name()+") "+askPrice.get();
-//					logger.info(log);
-					lowestAskPrice = Math.min(lowestAskPrice, askPrice.get());
+				Optional<Houbi> optHoubi = houbiList.stream()
+						.filter(b -> b.getSymbol().equalsIgnoreCase(cryptoTradingType.name())).findFirst();
+				if (optHoubi.isPresent()) {
+					Houbi houbi = optHoubi.get();
+					highestBidPrice = Math.max(highestBidPrice, houbi.getBid());
+					lowestAskPrice = Math.min(lowestAskPrice, houbi.getAsk());
 				}
 			}
-			logger.info("highestBidPrice "+highestBidPrice);
+			//logger.info("highestBidPrice "+highestBidPrice);
 			cryptoPricingService.update(cryptoTradingType.name(), CryptoPricing.ORDER_TYPE_SELL, highestBidPrice);
 			
-			logger.info("lowestAskPrice "+lowestAskPrice);
+			//logger.info("lowestAskPrice "+lowestAskPrice);
 			cryptoPricingService.update(cryptoTradingType.name(), CryptoPricing.ORDER_TYPE_BUY, lowestAskPrice);
 		}
 

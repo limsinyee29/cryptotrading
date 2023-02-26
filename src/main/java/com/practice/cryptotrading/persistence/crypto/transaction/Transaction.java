@@ -1,6 +1,6 @@
 package com.practice.cryptotrading.persistence.crypto.transaction;
 
-import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,16 +28,22 @@ public class Transaction {
 	private long id;
 
 	@Column(name = "user_id", nullable = false)
-	private long user;
+	private long userId;
 
 	@Column(name = "wallet_id")
-	private Long wallet;
+	private Long walletId;
+
+	@Column(name = "wallet_new_balance")
+	private Double walletNewBalance;
 
 	@Column(name = "wallet_crypto_id")
-	private Long cryptoWallet;
+	private Long cryptoWalletId;
 
-	@Column(name = "transaction_type", nullable = false)
-	private String transactionType;
+	@Column(name = "wallet_crypto_new_quantity_balance")
+	private Double cryptoWalletNewQtyBalance;
+
+	@Column(name = "order_type", nullable = false)
+	private String orderType;
 
 	@Column(name = "quantity", nullable = false)
 	private double quantity;
@@ -49,18 +55,20 @@ public class Transaction {
 	private double totalAmount;
 
 	@Column(name = "created_at", nullable = false)
-	private Timestamp createdAt;
+	private ZonedDateTime createdAt;
 
 	public Transaction() {
 
 	}
 
-	public Transaction(User user, Wallet wallet, CryptoWallet cryptoWallet, String transactionType, double quantity,
+	public Transaction(User user, Wallet wallet, CryptoWallet cryptoWallet, String orderType, double quantity,
 			double pricing, double totalAmount) {
-		this.user = user.getId();
-		this.wallet = wallet.getId();
-		this.cryptoWallet = cryptoWallet.getId();
-		this.transactionType = transactionType;
+		this.userId = user.getId();
+		this.walletId = wallet.getId();
+		this.walletNewBalance = wallet.getBalance();
+		this.cryptoWalletId = cryptoWallet.getId();
+		this.cryptoWalletNewQtyBalance = cryptoWallet.getQuantityBalance();
+		this.orderType = orderType;
 		this.quantity = quantity;
 		this.pricing = pricing;
 		this.totalAmount = totalAmount;
@@ -75,36 +83,52 @@ public class Transaction {
 		this.id = id;
 	}
 
-	public long getUser() {
-		return user;
+	public long getUserId() {
+		return userId;
 	}
 
-	public void setUser(long user) {
-		this.user = user;
+	public void setUserId(long userId) {
+		this.userId = userId;
 	}
 
-	public Long getWallet() {
-		return wallet;
+	public Long getWalletId() {
+		return walletId;
 	}
 
-	public void setWallet(Long wallet) {
-		this.wallet = wallet;
+	public void setWalletId(Long walletId) {
+		this.walletId = walletId;
 	}
 
-	public Long getCryptoWallet() {
-		return cryptoWallet;
+	public Double getWalletNewBalance() {
+		return walletNewBalance;
 	}
 
-	public void setCryptoWallet(Long cryptoWallet) {
-		this.cryptoWallet = cryptoWallet;
+	public void setWalletNewBalance(Double walletNewBalance) {
+		this.walletNewBalance = walletNewBalance;
 	}
 
-	public String getTransactionType() {
-		return transactionType;
+	public Long getCryptoWalletId() {
+		return cryptoWalletId;
 	}
 
-	public void setTransactionType(String transactionType) {
-		this.transactionType = transactionType;
+	public void setCryptoWalletId(Long cryptoWalletId) {
+		this.cryptoWalletId = cryptoWalletId;
+	}
+
+	public Double getCryptoWalletNewQtyBalance() {
+		return cryptoWalletNewQtyBalance;
+	}
+
+	public void setCryptoWalletNewQtyBalance(Double cryptoWalletNewQtyBalance) {
+		this.cryptoWalletNewQtyBalance = cryptoWalletNewQtyBalance;
+	}
+
+	public String getOrderType() {
+		return orderType;
+	}
+
+	public void setOrderType(String orderType) {
+		this.orderType = orderType;
 	}
 
 	public double getQuantity() {
@@ -131,11 +155,11 @@ public class Transaction {
 		this.totalAmount = totalAmount;
 	}
 
-	public Timestamp getCreatedAt() {
+	public ZonedDateTime getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(Timestamp createdAt) {
+	public void setCreatedAt(ZonedDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
 

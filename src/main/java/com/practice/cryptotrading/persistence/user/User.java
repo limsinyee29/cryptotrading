@@ -1,11 +1,10 @@
 package com.practice.cryptotrading.persistence.user;
 
-import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -33,18 +32,18 @@ public class User {
 	private String name;
 
 	@Column(name = "created_at", nullable = false)
-	private Timestamp createdAt;
+	private ZonedDateTime createdAt;
 
 	@Column(name = "updated_at")
-	private Timestamp updatedAt;
+	private ZonedDateTime updatedAt;
 
 	@JsonIgnore
 	@JsonManagedReference
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "user")
 	private List<Wallet> wallets;
 
 	@JsonManagedReference
-	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "user")
 	private List<CryptoWallet> cryptoWallets;
 
 	public User() {
@@ -67,20 +66,28 @@ public class User {
 		this.name = name;
 	}
 
-	public Timestamp getCreatedAt() {
+	public ZonedDateTime getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(Timestamp createdAt) {
+	public void setCreatedAt(ZonedDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
 
-	public Timestamp getUpdatedAt() {
+	public ZonedDateTime getUpdatedAt() {
 		return updatedAt;
 	}
 
-	public void setUpdatedAt(Timestamp updatedAt) {
+	public void setUpdatedAt(ZonedDateTime updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+
+	public List<Wallet> getWallets() {
+		return wallets;
+	}
+
+	public void setWallets(List<Wallet> wallets) {
+		this.wallets = wallets;
 	}
 
 	public List<CryptoWallet> getCryptoWallets() {

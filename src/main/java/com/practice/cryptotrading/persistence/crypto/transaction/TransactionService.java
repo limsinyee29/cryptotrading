@@ -1,21 +1,21 @@
 package com.practice.cryptotrading.persistence.crypto.transaction;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 /**
  * @author Sin Yee
  *
  */
 public interface TransactionService {
-	
+
 	/**
 	 * List user's transaction history
 	 * 
 	 * @param userId
 	 * @return transaction histories
 	 */
-	List<Transaction> listAll(Long userId);
-	
+	Page<Transaction> listAll(Long userId, int page, int pageSize, String orderBy, String orderDirection);
+
 	/**
 	 * Add transaction record
 	 * 

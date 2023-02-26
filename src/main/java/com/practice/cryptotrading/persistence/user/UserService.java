@@ -1,5 +1,9 @@
 package com.practice.cryptotrading.persistence.user;
 
+import java.util.List;
+
+import com.practice.cryptotrading.controller.TradeRequest;
+
 /**
  * @author Sin Yee
  *
@@ -31,6 +35,13 @@ public interface UserService {
 	 * @param quantity
 	 * @return user
 	 */
-	User trade(long id, String cryptoType, String orderType, double quantity);
+	User trade(long id, TradeRequest request);
+	
+	/**
+	 * List all user
+	 * 
+	 * @return users
+	 */
+	List<User> listAll();
 
 }

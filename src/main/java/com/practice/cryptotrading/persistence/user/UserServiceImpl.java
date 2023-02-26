@@ -1,5 +1,6 @@
 package com.practice.cryptotrading.persistence.user;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +10,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.practice.cryptotrading.controller.TradeRequest;
 import com.practice.cryptotrading.error.ErrorCode;
 import com.practice.cryptotrading.exception.ServiceException;
 import com.practice.cryptotrading.persistence.crypto.pricing.CryptoPricing;
@@ -24,8 +26,7 @@ import com.practice.cryptotrading.util.Utils;
  */
 @Service
 public class UserServiceImpl implements UserService {
-	
-	
+
 	@Autowired
 	EntityManager entityManager;
 
@@ -58,56 +59,66 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	@Transactional
-	public User trade(long id, String cryptoType, String orderType, double quantity) {
+	public User trade(long id, TradeRequest request) {
 		User user = findById(id);
 		if (user.getWallet() == null) {
 			throw new ServiceException(ErrorCode.WALLET_NOT_FOUND);
 		}
-		
-		CryptoPricing cryptoPricing = cryptoPricingService.findByCryptoTypeAndOrderType(cryptoType, orderType);
+
+		CryptoPricing cryptoPricing = cryptoPricingService.findByCryptoTypeAndOrderType(request.getCryptoType(),
+				request.getOrderType());
 
 		List<CryptoWallet> cryptoWallets = user.getCryptoWallets();
-		//compute total amount
-		double totalAmount = quantity * cryptoPricing.getPrice();
-		
+		// compute total amount
+		double totalAmount = request.getQuantity() * cryptoPricing.getPrice();
+
 		Optional<CryptoWallet> cyptoWalletOpt = cryptoWallets.stream()
-				.filter(w -> w.getType().equalsIgnoreCase(cryptoType)).findAny();
+				.filter(w -> w.getType().equalsIgnoreCase(request.getCryptoType())).findAny();
 		CryptoWallet cyptoWallet = null;
-		
-		if (CryptoPricing.ORDER_TYPE_BUY.equalsIgnoreCase(orderType)) {
+
+		ZonedDateTime updatedAt = Utils.getCurrentTimeStamp();
+		boolean success = false;
+		if (CryptoPricing.ORDER_TYPE_BUY.equalsIgnoreCase(request.getOrderType())) {
 			if (user.getWallet().getBalance() < totalAmount) {
 				throw new ServiceException(ErrorCode.BALANCE_INSUFFICIENT);
 			}
 			if (cyptoWalletOpt.isPresent()) {
 				cyptoWallet = cyptoWalletOpt.get();
-				cyptoWallet.setQuantityBalance(cyptoWallet.getQuantityBalance() + quantity);
-				cyptoWallet.setUpdatedAt(Utils.getCurrentTimeStamp());
+				cyptoWallet.setQuantityBalance(cyptoWallet.getQuantityBalance() + request.getQuantity());
+				cyptoWallet.setUpdatedAt(updatedAt);
 			} else {
-				cyptoWallet = new CryptoWallet(user.getId(), cryptoType, quantity);
+				cyptoWallet = new CryptoWallet(user.getId(), request.getCryptoType(), request.getQuantity());
 				entityManager.persist(cyptoWallet);
 				entityManager.flush();
-				
+
 			}
 			user.getWallet().setBalance(user.getWallet().getBalance() - totalAmount);
-			
-			transactionService.add(new Transaction(user, user.getWallet(), cyptoWallet, orderType, quantity,
-					cryptoPricing.getPrice(), totalAmount));
-			
-		} else if (CryptoPricing.ORDER_TYPE_SELL.equalsIgnoreCase(orderType)) {
+			success = true;
+		} else if (CryptoPricing.ORDER_TYPE_SELL.equalsIgnoreCase(request.getOrderType())) {
 			if (!cyptoWalletOpt.isPresent()) {
 				throw new ServiceException(ErrorCode.BALANCE_INSUFFICIENT);
 			}
 			cyptoWallet = cyptoWalletOpt.get();
-			if (cyptoWallet.getQuantityBalance() < quantity) {
+			if (cyptoWallet.getQuantityBalance() < request.getQuantity()) {
 				throw new ServiceException(ErrorCode.BALANCE_INSUFFICIENT);
 			}
-			cyptoWallet.setQuantityBalance(cyptoWallet.getQuantityBalance() - quantity);
-			cyptoWallet.setUpdatedAt(Utils.getCurrentTimeStamp());
+			cyptoWallet.setQuantityBalance(cyptoWallet.getQuantityBalance() - request.getQuantity());
+			cyptoWallet.setUpdatedAt(updatedAt);
 			user.getWallet().setBalance(user.getWallet().getBalance() + totalAmount);
-			transactionService.add(new Transaction(user, user.getWallet(), cyptoWallet, orderType, quantity,
-					cryptoPricing.getPrice(), totalAmount));
+			success = true;
 		}
-		return user;
+		if (success) {
+			transactionService.add(new Transaction(user, user.getWallet(), cyptoWallet, request.getOrderType(),
+					request.getQuantity(), cryptoPricing.getPrice(), totalAmount));
+			user.getWallet().setUpdatedAt(updatedAt);
+			user.setUpdatedAt(Utils.getCurrentTimeStamp());
+		}
+		return findById(id);
+	}
+
+	@Override
+	public List<User> listAll() {
+		return userRepository.findAll();
 	}
 
 }

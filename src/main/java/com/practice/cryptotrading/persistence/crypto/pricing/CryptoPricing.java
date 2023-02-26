@@ -1,6 +1,6 @@
 package com.practice.cryptotrading.persistence.crypto.pricing;
 
-import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -37,10 +37,10 @@ public class CryptoPricing {
 	private double price;
 
 	@Column(name = "created_at", nullable = false)
-	private Timestamp createdAt;
+	private ZonedDateTime createdAt;
 
 	@Column(name = "updated_at")
-	private Timestamp updatedAt;
+	private ZonedDateTime updatedAt;
 
 	public CryptoPricing() {
 
@@ -85,19 +85,19 @@ public class CryptoPricing {
 		this.price = price;
 	}
 
-	public Timestamp getCreatedAt() {
+	public ZonedDateTime getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(Timestamp createdAt) {
+	public void setCreatedAt(ZonedDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
 
-	public Timestamp getUpdatedAt() {
+	public ZonedDateTime getUpdatedAt() {
 		return updatedAt;
 	}
 
-	public void setUpdatedAt(Timestamp updatedAt) {
+	public void setUpdatedAt(ZonedDateTime updatedAt) {
 		this.updatedAt = updatedAt;
 	}
 

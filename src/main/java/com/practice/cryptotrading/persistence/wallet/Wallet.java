@@ -1,6 +1,6 @@
 package com.practice.cryptotrading.persistence.wallet;
 
-import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,10 +40,10 @@ public class Wallet {
 	private double balance;
 
 	@Column(name = "created_at", nullable = false)
-	private Timestamp createdAt;
+	private ZonedDateTime createdAt;
 
 	@Column(name = "updated_at")
-	private Timestamp updatedAt;
+	private ZonedDateTime updatedAt;
 
 	public Wallet() {
 
@@ -81,19 +81,19 @@ public class Wallet {
 		this.balance = balance;
 	}
 
-	public Timestamp getCreatedAt() {
+	public ZonedDateTime getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(Timestamp createdAt) {
+	public void setCreatedAt(ZonedDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
 
-	public Timestamp getUpdatedAt() {
+	public ZonedDateTime getUpdatedAt() {
 		return updatedAt;
 	}
 
-	public void setUpdatedAt(Timestamp updatedAt) {
+	public void setUpdatedAt(ZonedDateTime updatedAt) {
 		this.updatedAt = updatedAt;
 	}
 
